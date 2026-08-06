@@ -1,0 +1,12 @@
+name: YAML Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  yaml:
+    uses: akansof-org/.github/.github/workflows/reusable-yaml-check.yml@main
+

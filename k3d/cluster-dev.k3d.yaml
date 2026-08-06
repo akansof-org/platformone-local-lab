@@ -1,0 +1,78 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: dev # cluster will be named "k3d-dev"
+
+servers: 1
+agents: 2
+
+# Kubernetes API endpoint mapping on your laptop
+kubeAPI:
+  host: "127.0.0.1"
+  hostIP: "127.0.0.1"
+  hostPort: "6445"
+
+# Pick a stable k3s image tag you want to standardize on
+image: rancher/k3s:v1.35.2-k3s1
+
+# Dedicated docker network for the lab cluster
+# network: platformone-k3d-dev-net
+subnet: "172.28.0.0/16"
+
+# Let k3d create a local registry you can push to
+registries:
+  create:
+    name: registry.localhost
+    host: "0.0.0.0"
+    hostPort: "7445"
+    volumes:
+      - /Users/aankansah/Code/akansof/09-runtime/local-registry/k3d-dev:/var/lib/registry
+
+# Common host->node mounts (keeps repos clean and puts runtime data in 09-runtime)
+volumes:
+  - volume: /Users/aankansah/Code/akansof/09-runtime/kubeconfigs:/kubeconfigs
+    nodeFilters:
+      - server:0
+      - agent:*
+  - volume: /Users/aankansah/Code/akansof/09-runtime/generated-config:/generated
+    nodeFilters:
+      - server:0
+      - agent:*
+
+# Port mappings into the cluster (LB container)
+ports:
+  - port: 8080:80
+    nodeFilters:
+      - loadbalancer
+  - port: 8443:443
+    nodeFilters:
+      - loadbalancer
+
+# # Optional: inject manifests at cluster boot (example Namespace)
+# files:
+#   - description: "Bootstrap namespace: platformone"
+#     destination: k3s-manifests-custom/platformone-namespace.yaml
+#     source: |
+#       apiVersion: v1
+#       kind: Namespace
+#       metadata:
+#         name: platformone
+
+options:
+  k3d:
+    wait: true
+    timeout: "120s"
+    disableLoadbalancer: false
+    disableImageVolume: false
+    disableRollback: false
+
+  k3s:
+    extraArgs:
+      # Make the API server cert valid for localhost (handy for some clients)
+      - arg: "--tls-san=127.0.0.1"
+        nodeFilters:
+          - server:*
+
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
