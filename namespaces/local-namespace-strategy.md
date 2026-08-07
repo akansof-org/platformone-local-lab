@@ -38,6 +38,7 @@ Every managed namespace has these labels:
 platformone.io/managed-by=platformone-local-lab
 platformone.io/environment=local
 platformone.io/purpose=<purpose>
+platformone.io/owner=<owner>
 ```
 
 Current purpose values:
@@ -50,6 +51,19 @@ Current purpose values:
 | `gitops` | `gitops` |
 | `apps` | `product-workloads` |
 | `sandbox` | `experiments` |
+
+## Ownership
+
+Namespace ownership identifies the team or function responsible for the namespace's operating model, baseline configuration, and first-line review of changes.
+
+| Namespace | Owner label | Ownership scope |
+| --- | --- | --- |
+| `platformone-system` | `platform-engineering` | Platform controllers and internal platform services. |
+| `observability` | `sre` | Metrics, logs, tracing, dashboards, and alerting tools. |
+| `security` | `security-engineering` | Policy, scanning, admission, and security tooling. |
+| `gitops` | `platform-engineering` | GitOps controllers and delivery automation. |
+| `apps` | `product-engineering` | Product workloads and local product demos. |
+| `sandbox` | `platform-engineering` | Temporary experiments and learning workloads. |
 
 ## Verification
 

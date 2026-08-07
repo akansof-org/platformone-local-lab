@@ -6,6 +6,7 @@ metadata:
     platformone.io/managed-by: platformone-local-lab
     platformone.io/environment: local
     platformone.io/purpose: platform-core
+    platformone.io/owner: platform-engineering
 ---
 apiVersion: v1
 kind: Namespace
@@ -15,6 +16,7 @@ metadata:
     platformone.io/managed-by: platformone-local-lab
     platformone.io/environment: local
     platformone.io/purpose: observability
+    platformone.io/owner: sre
 ---
 apiVersion: v1
 kind: Namespace
@@ -24,6 +26,7 @@ metadata:
     platformone.io/managed-by: platformone-local-lab
     platformone.io/environment: local
     platformone.io/purpose: security
+    platformone.io/owner: security-engineering
 ---
 apiVersion: v1
 kind: Namespace
@@ -33,6 +36,7 @@ metadata:
     platformone.io/managed-by: platformone-local-lab
     platformone.io/environment: local
     platformone.io/purpose: gitops
+    platformone.io/owner: platform-engineering
 ---
 apiVersion: v1
 kind: Namespace
@@ -42,6 +46,7 @@ metadata:
     platformone.io/managed-by: platformone-local-lab
     platformone.io/environment: local
     platformone.io/purpose: product-workloads
+    platformone.io/owner: product-engineering
 ---
 apiVersion: v1
 kind: Namespace
@@ -51,3 +56,4 @@ metadata:
     platformone.io/managed-by: platformone-local-lab
     platformone.io/environment: local
     platformone.io/purpose: experiments
+    platformone.io/owner: platform-engineering

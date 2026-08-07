@@ -183,6 +183,7 @@ Managed local namespaces are labelled with:
 ```text
 platformone.io/managed-by=platformone-local-lab
 platformone.io/environment=local
+platformone.io/owner=<owner>
 ```
 
 The current managed namespace set is `platformone-system`, `observability`, `security`, `gitops`, `apps`, and `sandbox`.
