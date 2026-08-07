@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: storage-smoke-pvc
+  namespace: default
+  labels:
+    app: storage-smoke
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 128Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: storage-smoke-pod
+  namespace: default
+  labels:
+    app: storage-smoke
+spec:
+  restartPolicy: Never
+  containers:
+    - name: writer
+      image: busybox:1.36
+      command:
+        - /bin/sh
+        - -c
+      args:
+        - |
+          set -eux
+          if [ ! -f /data/hello.txt ]; then
+            echo "hello from pvc" > /data/hello.txt
+          fi
+          date >> /data/hello.txt
+          echo "stored file:"
+          cat /data/hello.txt
+          sleep 3600
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: storage-smoke-pvc

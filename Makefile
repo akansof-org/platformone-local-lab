@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset
+.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete
 
 cluster-prereqs:
 	./scripts/cluster/prereqs.sh
@@ -16,3 +16,32 @@ cluster-down:
 
 cluster-reset:
 	./scripts/cluster/reset.sh
+
+smoke-apply:
+	kubectl apply -f manifests/smoke-test.yaml
+
+smoke-verify:
+	kubectl get pods -l app=smoke-echo
+	kubectl get ingress smoke-echo
+	curl -i -H "Host: test.platformone.local" http://127.0.0.1:8080
+
+smoke-delete:
+	kubectl delete -f manifests/smoke-test.yaml
+
+storage-apply:
+	kubectl apply -f manifests/storage-smoke-test.yaml
+
+storage-verify:
+	kubectl get storageclass
+	kubectl wait --for=jsonpath='{.status.phase}'=Bound pvc/storage-smoke-pvc --timeout=120s
+	kubectl wait --for=condition=Ready pod/storage-smoke-pod --timeout=120s
+	kubectl get pvc storage-smoke-pvc
+	kubectl get pod storage-smoke-pod
+	kubectl exec storage-smoke-pod -- cat /data/hello.txt
+
+storage-restart:
+	kubectl delete pod storage-smoke-pod --ignore-not-found=true --wait=true
+	kubectl apply -f manifests/storage-smoke-test.yaml
+
+storage-delete:
+	kubectl delete -f manifests/storage-smoke-test.yaml

@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smoke-echo
+  namespace: default
+  labels:
+    app: smoke-echo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smoke-echo
+  template:
+    metadata:
+      labels:
+        app: smoke-echo
+    spec:
+      containers:
+        - name: echo
+          image: traefik/whoami:v1.10.1
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smoke-echo
+  namespace: default
+  labels:
+    app: smoke-echo
+spec:
+  selector:
+    app: smoke-echo
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: smoke-echo
+  namespace: default
+spec:
+  rules:
+    - host: test.platformone.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: smoke-echo
+                port:
+                  number: 80

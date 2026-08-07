@@ -18,7 +18,7 @@ if [[ "${missing}" -ne 0 ]]; then
 Install the missing tools, then rerun:
   make cluster-prereqs
 
-Standard Stage 4 tool choices:
+Standard local cluster tool choices:
   docker   - container runtime for k3d nodes
   k3d      - laptop Kubernetes distribution
   kubectl  - Kubernetes client

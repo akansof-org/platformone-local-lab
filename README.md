@@ -130,6 +130,101 @@ To rebuild while clearing PlatformOne runtime data:
 CLEAN_RUNTIME=1 make cluster-reset
 ```
 
+## Registry Strategy
+
+PlatformOne uses a hybrid image workflow for the local k3d cluster:
+
+- Fast dev path: build locally, then import the image into k3d with `k3d image import`.
+- AWS proof path: build, push to Amazon ECR, then let the local cluster pull with an `imagePullSecret`.
+
+The detailed strategy lives in:
+
+```text
+registry/local-registry-strategy.md
+```
+
+Short version:
+
+```bash
+docker build -t shopease/cartservice:dev .
+k3d image import shopease/cartservice:dev -c dev
+```
+
+Use ECR when you need AWS-realistic CI/CD, GitOps, or portfolio evidence. Because k3d is local and not EKS, ECR pulls require a namespace-local Kubernetes image pull secret such as `ecr-pull-secret`.
+
+The ECR path also requires the AWS CLI and valid AWS credentials for the target account and region.
+
+## Storage Strategy
+
+The local cluster uses the default k3s `local-path` StorageClass for development-grade PVC behavior.
+
+The detailed strategy lives in:
+
+```text
+storage/local-storage-strategy.md
+```
+
+The reusable storage smoke manifest lives in:
+
+```text
+manifests/storage-smoke-test.yaml
+```
+
+Run it with:
+
+```bash
+make storage-apply
+make storage-verify
+make storage-restart
+make storage-verify
+make storage-delete
+```
+
+PVC data is expected to survive pod recreation when the PVC is retained. Data is treated as disposable across full k3d cluster deletion unless it is backed up separately.
+
+## DNS And TLS Strategy
+
+The local environment uses stable hostnames with HTTP-only ingress:
+
+```text
+*.platformone.local
+```
+
+The default laptop mapping is:
+
+```text
+127.0.0.1 test.platformone.local
+127.0.0.1 shopease.platformone.local
+```
+
+The detailed strategy lives in:
+
+```text
+networking/local-dns-tls-strategy.md
+```
+
+The draft access runbook lives in:
+
+```text
+networking/access-services-locally-runbook.md
+```
+
+The reusable Traefik smoke manifest lives in:
+
+```text
+manifests/smoke-test.yaml
+```
+
+Apply it with:
+
+```bash
+make smoke-apply
+make smoke-verify
+make smoke-delete
+```
+
+The current local baseline deliberately avoids HTTPS and certificate trust setup. A planned enhancement will introduce a local CA plus cert-manager for `*.platformone.local`.
+
 ## Validation Details
 
 `make cluster-verify` creates a temporary namespace named `cluster-smoke`, then removes it when validation exits.
@@ -228,7 +323,7 @@ make cluster-prereqs
 
 ## Documentation
 
-The fuller Stage 4 runbook lives in:
+The fuller local cluster lifecycle runbook lives in:
 
 ```text
 ../platformone-docs/docs/engineering/local-cluster-lifecycle.md
