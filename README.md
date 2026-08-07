@@ -95,6 +95,7 @@ Use `make cluster-prereqs` to verify the tools and print their versions.
 | `make cluster-prereqs` | Verifies required commands and Docker daemon access. |
 | `make cluster-up` | Creates the `dev` cluster from `k3d/cluster-dev.k3d.yaml`; exits cleanly if it already exists. |
 | `make cluster-verify` | Runs node, core pod, DNS, and ingress smoke checks. |
+| `make cluster-health` | Runs baseline, ingress, and storage health checks. |
 | `make cluster-down` | Deletes the `dev` k3d cluster while preserving runtime data for inspection. |
 | `make cluster-reset` | Deletes, recreates, and validates the cluster. |
 
@@ -244,6 +245,25 @@ cluster-smoke.localhost
 ```
 
 The validation script sends the host header directly with `curl`, so no manual `/etc/hosts` change is required for this smoke test.
+
+## Cluster Health Checks
+
+The local lab has three health-check tiers:
+
+```bash
+kubectl get nodes
+kubectl get pods -n kube-system
+make cluster-verify
+make cluster-health
+```
+
+The detailed health runbook lives in:
+
+```text
+health/cluster-health-checks.md
+```
+
+`make cluster-health` runs the baseline cluster verification, the Traefik ingress smoke test, and the local storage smoke test.
 
 ## Updating The Cluster
 

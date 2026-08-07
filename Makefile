@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete
+.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete
 
 cluster-prereqs:
 	./scripts/cluster/prereqs.sh
@@ -17,6 +17,18 @@ cluster-down:
 cluster-reset:
 	./scripts/cluster/reset.sh
 
+cluster-health: cluster-verify
+	-$(MAKE) smoke-delete
+	$(MAKE) smoke-apply
+	$(MAKE) smoke-verify
+	$(MAKE) smoke-delete
+	-$(MAKE) storage-delete
+	$(MAKE) storage-apply
+	$(MAKE) storage-verify
+	$(MAKE) storage-restart
+	$(MAKE) storage-verify
+	$(MAKE) storage-delete
+
 smoke-apply:
 	kubectl apply -f manifests/smoke-test.yaml
 
@@ -26,7 +38,7 @@ smoke-verify:
 	curl -i -H "Host: test.platformone.local" http://127.0.0.1:8080
 
 smoke-delete:
-	kubectl delete -f manifests/smoke-test.yaml
+	kubectl delete -f manifests/smoke-test.yaml --ignore-not-found=true
 
 storage-apply:
 	kubectl apply -f manifests/storage-smoke-test.yaml
@@ -44,4 +56,4 @@ storage-restart:
 	kubectl apply -f manifests/storage-smoke-test.yaml
 
 storage-delete:
-	kubectl delete -f manifests/storage-smoke-test.yaml
+	kubectl delete -f manifests/storage-smoke-test.yaml --ignore-not-found=true
