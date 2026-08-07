@@ -96,6 +96,8 @@ Use `make cluster-prereqs` to verify the tools and print their versions.
 | `make cluster-up` | Creates the `dev` cluster from `k3d/cluster-dev.k3d.yaml`; exits cleanly if it already exists. |
 | `make cluster-verify` | Runs node, core pod, DNS, and ingress smoke checks. |
 | `make cluster-health` | Runs baseline, ingress, and storage health checks. |
+| `make namespaces-apply` | Applies the local platform namespace baseline. |
+| `make namespaces-verify` | Verifies the managed namespace labels and expected namespaces. |
 | `make cluster-down` | Deletes the `dev` k3d cluster while preserving runtime data for inspection. |
 | `make cluster-reset` | Deletes, recreates, and validates the cluster. |
 
@@ -154,6 +156,36 @@ k3d image import shopease/cartservice:dev -c dev
 Use ECR when you need AWS-realistic CI/CD, GitOps, or portfolio evidence. Because k3d is local and not EKS, ECR pulls require a namespace-local Kubernetes image pull secret such as `ecr-pull-secret`.
 
 The ECR path also requires the AWS CLI and valid AWS credentials for the target account and region.
+
+## Namespace Strategy
+
+The local platform namespace baseline is defined in:
+
+```text
+manifests/platform-namespaces.yaml
+```
+
+The detailed namespace strategy lives in:
+
+```text
+namespaces/local-namespace-strategy.md
+```
+
+Apply and verify it with:
+
+```bash
+make namespaces-apply
+make namespaces-verify
+```
+
+Managed local namespaces are labelled with:
+
+```text
+platformone.io/managed-by=platformone-local-lab
+platformone.io/environment=local
+```
+
+The current managed namespace set is `platformone-system`, `observability`, `security`, `gitops`, `apps`, and `sandbox`.
 
 ## Storage Strategy
 

@@ -57,3 +57,14 @@ storage-restart:
 
 storage-delete:
 	kubectl delete -f manifests/storage-smoke-test.yaml --ignore-not-found=true
+
+PLATFORM_NAMESPACES := platformone-system observability security gitops apps sandbox
+
+namespaces-apply:
+	kubectl apply -f manifests/platform-namespaces.yaml
+
+namespaces-verify:
+	@for ns in $(PLATFORM_NAMESPACES); do \
+		kubectl get namespace $$ns >/dev/null || exit 1; \
+	done
+	kubectl get namespaces --show-labels | grep 'platformone.io/managed-by=platformone-local-lab'

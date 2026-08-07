@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: platformone-system
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/environment: local
+    platformone.io/purpose: platform-core
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/environment: local
+    platformone.io/purpose: observability
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: security
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/environment: local
+    platformone.io/purpose: security
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gitops
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/environment: local
+    platformone.io/purpose: gitops
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: apps
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/environment: local
+    platformone.io/purpose: product-workloads
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sandbox
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/environment: local
+    platformone.io/purpose: experiments
