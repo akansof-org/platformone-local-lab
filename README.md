@@ -100,6 +100,8 @@ Use `make cluster-prereqs` to verify the tools and print their versions.
 | `make namespaces-verify` | Verifies the managed namespace labels and expected namespaces. |
 | `make guardrails-apply` | Applies ResourceQuota and LimitRange guardrails. |
 | `make guardrails-verify` | Verifies namespace resource guardrails. |
+| `make rbac-apply` | Applies the namespace RBAC scaffold. |
+| `make rbac-verify` | Verifies the implemented RBAC resources. |
 | `make cluster-down` | Deletes the `dev` k3d cluster while preserving runtime data for inspection. |
 | `make cluster-reset` | Deletes, recreates, and validates the cluster. |
 
@@ -195,7 +197,14 @@ The current managed namespace set is `platformone-system`, `observability`, `sec
 The local platform resource guardrails are defined in:
 
 ```text
-manifests/platform-resource-guardrails.yaml
+manifests/resource-guardrails/
+```
+
+The guardrail manifests are split by resource type:
+
+```text
+manifests/resource-guardrails/resourcequotas.yaml
+manifests/resource-guardrails/limitranges.yaml
 ```
 
 The detailed guardrail strategy lives in:
@@ -212,6 +221,32 @@ make guardrails-verify
 ```
 
 The guardrails use `ResourceQuota` for namespace-level caps and `LimitRange` for container and PVC defaults/bounds.
+
+## RBAC Strategy
+
+The local RBAC scaffold is defined in:
+
+```text
+manifests/rbac/
+└── apps/
+    ├── roles.yaml
+    └── rolebindings.yaml
+```
+
+The detailed RBAC strategy lives in:
+
+```text
+namespaces/local-rbac-strategy.md
+```
+
+Apply and verify it with:
+
+```bash
+make rbac-apply
+make rbac-verify
+```
+
+The current manifests implement the RBAC pattern for the `apps` namespace. `make rbac-apply` applies the RBAC tree recursively so additional namespace folders can be added under `manifests/rbac/`.
 
 ## Storage Strategy
 

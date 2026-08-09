@@ -4,12 +4,19 @@ PlatformOne uses Kubernetes `ResourceQuota` and `LimitRange` objects to keep loc
 
 The guardrails are intentionally development-grade. They protect the laptop cluster from accidental resource sprawl while keeping enough room for platform tooling, product demos, and experiments.
 
-## Guardrail Manifest
+## Guardrail Manifests
 
-The guardrail manifest is:
+The guardrail manifests are stored under:
 
 ```text
-manifests/platform-resource-guardrails.yaml
+manifests/resource-guardrails/
+```
+
+The guardrails are split by resource type:
+
+```text
+manifests/resource-guardrails/resourcequotas.yaml
+manifests/resource-guardrails/limitranges.yaml
 ```
 
 Apply and verify it from the local-lab repository root:
