@@ -98,6 +98,8 @@ Use `make cluster-prereqs` to verify the tools and print their versions.
 | `make cluster-health` | Runs baseline, ingress, and storage health checks. |
 | `make namespaces-apply` | Applies the local platform namespace baseline. |
 | `make namespaces-verify` | Verifies the managed namespace labels and expected namespaces. |
+| `make guardrails-apply` | Applies ResourceQuota and LimitRange guardrails. |
+| `make guardrails-verify` | Verifies namespace resource guardrails. |
 | `make cluster-down` | Deletes the `dev` k3d cluster while preserving runtime data for inspection. |
 | `make cluster-reset` | Deletes, recreates, and validates the cluster. |
 
@@ -187,6 +189,29 @@ platformone.io/owner=<owner>
 ```
 
 The current managed namespace set is `platformone-system`, `observability`, `security`, `gitops`, `apps`, and `sandbox`.
+
+## Resource Guardrails
+
+The local platform resource guardrails are defined in:
+
+```text
+manifests/platform-resource-guardrails.yaml
+```
+
+The detailed guardrail strategy lives in:
+
+```text
+namespaces/local-resource-guardrails.md
+```
+
+Apply and verify them with:
+
+```bash
+make guardrails-apply
+make guardrails-verify
+```
+
+The guardrails use `ResourceQuota` for namespace-level caps and `LimitRange` for container and PVC defaults/bounds.
 
 ## Storage Strategy
 

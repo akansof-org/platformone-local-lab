@@ -1,0 +1,281 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: platformone-system-quota
+  namespace: platformone-system
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: resource-quota
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 2Gi
+    limits.cpu: "4"
+    limits.memory: 4Gi
+    pods: "20"
+    persistentvolumeclaims: "5"
+    requests.storage: 10Gi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: platformone-system-defaults
+  namespace: platformone-system
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: limit-range
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      default:
+        cpu: 500m
+        memory: 512Mi
+      min:
+        cpu: 25m
+        memory: 64Mi
+      max:
+        cpu: "1"
+        memory: 1Gi
+    - type: PersistentVolumeClaim
+      min:
+        storage: 128Mi
+      max:
+        storage: 5Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: observability-quota
+  namespace: observability
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: resource-quota
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 3Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi
+    pods: "25"
+    persistentvolumeclaims: "8"
+    requests.storage: 20Gi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: observability-defaults
+  namespace: observability
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: limit-range
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 256Mi
+      default:
+        cpu: 500m
+        memory: 1Gi
+      min:
+        cpu: 25m
+        memory: 64Mi
+      max:
+        cpu: "2"
+        memory: 4Gi
+    - type: PersistentVolumeClaim
+      min:
+        storage: 128Mi
+      max:
+        storage: 10Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: security-quota
+  namespace: security
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: resource-quota
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 2Gi
+    limits.cpu: "4"
+    limits.memory: 4Gi
+    pods: "15"
+    persistentvolumeclaims: "4"
+    requests.storage: 8Gi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: security-defaults
+  namespace: security
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: limit-range
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      default:
+        cpu: 500m
+        memory: 512Mi
+      min:
+        cpu: 25m
+        memory: 64Mi
+      max:
+        cpu: "1"
+        memory: 2Gi
+    - type: PersistentVolumeClaim
+      min:
+        storage: 128Mi
+      max:
+        storage: 5Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: gitops-quota
+  namespace: gitops
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: resource-quota
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    pods: "10"
+    persistentvolumeclaims: "3"
+    requests.storage: 5Gi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: gitops-defaults
+  namespace: gitops
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: limit-range
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      default:
+        cpu: 500m
+        memory: 512Mi
+      min:
+        cpu: 25m
+        memory: 64Mi
+      max:
+        cpu: "1"
+        memory: 1Gi
+    - type: PersistentVolumeClaim
+      min:
+        storage: 128Mi
+      max:
+        storage: 5Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: apps-quota
+  namespace: apps
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: resource-quota
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 6Gi
+    limits.cpu: "8"
+    limits.memory: 12Gi
+    pods: "40"
+    persistentvolumeclaims: "10"
+    requests.storage: 20Gi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: apps-defaults
+  namespace: apps
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: limit-range
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      default:
+        cpu: 500m
+        memory: 512Mi
+      min:
+        cpu: 25m
+        memory: 64Mi
+      max:
+        cpu: "2"
+        memory: 2Gi
+    - type: PersistentVolumeClaim
+      min:
+        storage: 128Mi
+      max:
+        storage: 10Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: sandbox-quota
+  namespace: sandbox
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: resource-quota
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    pods: "10"
+    persistentvolumeclaims: "2"
+    requests.storage: 2Gi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: sandbox-defaults
+  namespace: sandbox
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/guardrail-type: limit-range
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 50m
+        memory: 64Mi
+      default:
+        cpu: 250m
+        memory: 256Mi
+      min:
+        cpu: 25m
+        memory: 32Mi
+      max:
+        cpu: 500m
+        memory: 512Mi
+    - type: PersistentVolumeClaim
+      min:
+        storage: 128Mi
+      max:
+        storage: 1Gi

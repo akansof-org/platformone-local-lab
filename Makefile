@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete
+.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify
 
 cluster-prereqs:
 	./scripts/cluster/prereqs.sh
@@ -68,3 +68,20 @@ namespaces-verify:
 		kubectl get namespace $$ns >/dev/null || exit 1; \
 	done
 	kubectl get namespaces --show-labels | grep 'platformone.io/managed-by=platformone-local-lab'
+
+guardrails-apply:
+	kubectl apply -f manifests/platform-resource-guardrails.yaml
+
+guardrails-verify:
+	kubectl get resourcequota -n platformone-system
+	kubectl get resourcequota -n observability
+	kubectl get resourcequota -n security
+	kubectl get resourcequota -n gitops
+	kubectl get resourcequota -n apps
+	kubectl get resourcequota -n sandbox
+	kubectl get limitrange -n platformone-system
+	kubectl get limitrange -n observability
+	kubectl get limitrange -n security
+	kubectl get limitrange -n gitops
+	kubectl get limitrange -n apps
+	kubectl get limitrange -n sandbox
