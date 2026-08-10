@@ -1,0 +1,77 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: platformone-system
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/network-policy-type: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: observability
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/network-policy-type: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: security
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/network-policy-type: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: gitops
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/network-policy-type: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: apps
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/network-policy-type: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: sandbox
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/network-policy-type: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress

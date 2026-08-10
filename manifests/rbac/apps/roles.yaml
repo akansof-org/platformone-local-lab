@@ -24,7 +24,7 @@ metadata:
     platformone.io/rbac-role: namespace-editor
 rules:
   - apiGroups:
-      - ""
+      - "" ## Core apiGroup
     resources:
       - configmaps
       - endpoints
@@ -106,7 +106,7 @@ metadata:
     platformone.io/rbac-role: namespace-viewer
 rules:
   - apiGroups:
-      - ""
+      - "" ## Core apiGroup
     resources:
       - configmaps
       - endpoints

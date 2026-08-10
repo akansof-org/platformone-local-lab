@@ -248,6 +248,31 @@ make rbac-verify
 
 The current manifests implement the RBAC pattern for the `apps` namespace. `make rbac-apply` applies the RBAC tree recursively so additional namespace folders can be added under `manifests/rbac/`.
 
+## Network Policy Strategy
+
+The local network policy manifests are organized by policy responsibility:
+
+```text
+manifests/network-policies/
+├── baseline/
+│   └── default-deny-ingress.yaml
+├── platform/
+└── namespaces/
+    ├── apps/
+    ├── gitops/
+    ├── observability/
+    ├── sandbox/
+    └── security/
+```
+
+The detailed network policy strategy lives in:
+
+```text
+networking/local-network-policy-strategy.md
+```
+
+The current starter policy defines default-deny ingress for the managed platform namespaces. It is intentionally not wired into a Make target yet, so network policy enforcement is not applied accidentally before allow rules and smoke tests are ready.
+
 ## Storage Strategy
 
 The local cluster uses the default k3s `local-path` StorageClass for development-grade PVC behavior.
