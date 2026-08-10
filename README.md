@@ -228,7 +228,22 @@ The local RBAC scaffold is defined in:
 
 ```text
 manifests/rbac/
-└── apps/
+├── apps/
+│   ├── roles.yaml
+│   └── rolebindings.yaml
+├── gitops/
+│   ├── roles.yaml
+│   └── rolebindings.yaml
+├── observability/
+│   ├── roles.yaml
+│   └── rolebindings.yaml
+├── platformone-system/
+│   ├── roles.yaml
+│   └── rolebindings.yaml
+├── sandbox/
+│   ├── roles.yaml
+│   └── rolebindings.yaml
+└── security/
     ├── roles.yaml
     └── rolebindings.yaml
 ```
@@ -246,7 +261,7 @@ make rbac-apply
 make rbac-verify
 ```
 
-The current manifests implement the RBAC pattern for the `apps` namespace. `make rbac-apply` applies the RBAC tree recursively so additional namespace folders can be added under `manifests/rbac/`.
+The current manifests implement the RBAC pattern for all managed platform namespaces. `make rbac-apply` applies the RBAC tree recursively.
 
 ## Network Policy Strategy
 

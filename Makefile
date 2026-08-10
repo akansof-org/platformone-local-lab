@@ -91,3 +91,8 @@ rbac-apply:
 
 rbac-verify:
 	kubectl get role,rolebinding -n apps
+	kubectl get role,rolebinding -n observability
+	kubectl get role,rolebinding -n security
+	kubectl get role,rolebinding -n gitops
+	kubectl get role,rolebinding -n platformone-system
+	kubectl get role,rolebinding -n sandbox

@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: platformone-system-admin
+  namespace: platformone-system
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/rbac-binding: namespace-owner
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: platformone-namespace-admin
+subjects:
+  - kind: Group
+    name: platformone:platform-engineering
+    apiGroup: rbac.authorization.k8s.io

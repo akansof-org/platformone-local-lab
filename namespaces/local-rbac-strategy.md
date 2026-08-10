@@ -2,7 +2,7 @@
 
 PlatformOne uses namespace-scoped Kubernetes RBAC to model platform access boundaries in the local k3d cluster.
 
-The current checked-in RBAC manifests implement the pattern for the `apps` namespace. The same role and binding structure should be repeated for the remaining managed namespaces.
+The checked-in RBAC manifests implement the namespace RBAC pattern for all managed platform namespaces.
 
 ## RBAC Manifests
 
@@ -10,12 +10,27 @@ The RBAC manifests are organized by namespace, then split by resource type:
 
 ```text
 manifests/rbac/
-└── apps/
+├── apps/
+│   ├── roles.yaml
+│   └── rolebindings.yaml
+├── gitops/
+│   ├── roles.yaml
+│   └── rolebindings.yaml
+├── observability/
+│   ├── roles.yaml
+│   └── rolebindings.yaml
+├── platformone-system/
+│   ├── roles.yaml
+│   └── rolebindings.yaml
+├── sandbox/
+│   ├── roles.yaml
+│   └── rolebindings.yaml
+└── security/
     ├── roles.yaml
     └── rolebindings.yaml
 ```
 
-Apply and verify it from the local-lab repository root. The apply target uses recursive apply so future namespace folders under `manifests/rbac/` are included automatically.
+Apply and verify it from the local-lab repository root. The apply target uses recursive apply so namespace folders under `manifests/rbac/` are included automatically.
 
 ```bash
 make rbac-apply
@@ -56,45 +71,35 @@ RBAC does not provide authentication by itself. It only defines what an authenti
 | `apps` | `platformone:product-engineering` |
 | `sandbox` | `platformone:platform-engineering` |
 
-Platform engineering should receive viewer access across managed namespaces for operational visibility.
+Platform engineering receives operational visibility across managed namespaces. Non-platform-owned namespaces use an explicit viewer binding. Platform-owned namespaces grant the same group admin access, so a separate viewer binding would be redundant.
 
-## Implemented Reference Namespace
+## Implemented Bindings
 
-The `apps` namespace is the reference implementation.
+Each managed namespace includes the standard role set:
 
-It includes:
-
-- `Role/platformone-namespace-admin`
-- `Role/platformone-namespace-editor`
-- `Role/platformone-namespace-viewer`
-- `RoleBinding/apps-admin`
-- `RoleBinding/apps-platform-engineering-viewer`
-
-Bindings:
-
-| Binding | Subject | Role |
-| --- | --- | --- |
-| `apps-admin` | `platformone:product-engineering` | `platformone-namespace-admin` |
-| `apps-platform-engineering-viewer` | `platformone:platform-engineering` | `platformone-namespace-viewer` |
-
-## Replication Pattern
-
-To extend this to another namespace:
-
-1. Create a folder under `manifests/rbac/` using the namespace name.
-2. Copy `apps/roles.yaml` into the new folder.
-3. Copy `apps/rolebindings.yaml` into the new folder.
-4. Change `metadata.namespace` to the target namespace in both files.
-5. Update RoleBinding names and subject groups for the namespace owner.
-6. Run `make rbac-apply`.
-7. Run `make rbac-verify`.
+| Namespace | Binding | Subject | Role |
+| --- | --- | --- | --- |
+| `apps` | `apps-admin` | `platformone:product-engineering` | `platformone-namespace-admin` |
+| `apps` | `apps-platform-engineering-viewer` | `platformone:platform-engineering` | `platformone-namespace-viewer` |
+| `observability` | `observability-sre-admin` | `platformone:sre` | `platformone-namespace-admin` |
+| `observability` | `observability-platform-engineering-viewer` | `platformone:platform-engineering` | `platformone-namespace-viewer` |
+| `security` | `security-security-engineering-admin` | `platformone:security-engineering` | `platformone-namespace-admin` |
+| `security` | `security-platform-engineering-viewer` | `platformone:platform-engineering` | `platformone-namespace-viewer` |
+| `gitops` | `gitops-admin` | `platformone:platform-engineering` | `platformone-namespace-admin` |
+| `platformone-system` | `platformone-system-admin` | `platformone:platform-engineering` | `platformone-namespace-admin` |
+| `sandbox` | `sandbox-admin` | `platformone:platform-engineering` | `platformone-namespace-admin` |
 
 ## Verification
 
-Current verification lists RBAC resources in the implemented namespace:
+Current verification lists RBAC resources in all managed namespaces:
 
 ```bash
 kubectl get role,rolebinding -n apps
+kubectl get role,rolebinding -n observability
+kubectl get role,rolebinding -n security
+kubectl get role,rolebinding -n gitops
+kubectl get role,rolebinding -n platformone-system
+kubectl get role,rolebinding -n sandbox
 ```
 
 ## TODO
