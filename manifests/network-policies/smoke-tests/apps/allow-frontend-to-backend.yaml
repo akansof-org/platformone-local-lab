@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-frontend-to-backend
+  namespace: apps
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/network-policy-type: namespace-allow
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: shopease
+      app.kubernetes.io/component: backend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/part-of: shopease
+              app.kubernetes.io/component: frontend
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 8080

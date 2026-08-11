@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-backend-to-database
+  namespace: apps
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/network-policy-type: namespace-allow
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: shopease
+      app.kubernetes.io/component: database
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/part-of: shopease
+              app.kubernetes.io/component: backend
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 6379

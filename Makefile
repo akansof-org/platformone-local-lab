@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify rbac-apply rbac-verify
+.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify rbac-apply rbac-verify network-policies-smoke-policies-apply network-policies-smoke-policies-verify network-policies-smoke-apply network-policies-smoke-verify network-policies-smoke-delete
 
 cluster-prereqs:
 	./scripts/cluster/prereqs.sh
@@ -96,3 +96,30 @@ rbac-verify:
 	kubectl get role,rolebinding -n gitops
 	kubectl get role,rolebinding -n platformone-system
 	kubectl get role,rolebinding -n sandbox
+
+network-policies-smoke-policies-apply:
+	kubectl apply -f manifests/network-policies/baseline/default-deny-ingress.yaml
+	kubectl apply -f manifests/network-policies/smoke-tests/apps/allow-ingress-controller.yaml
+	kubectl apply -f manifests/network-policies/smoke-tests/apps/allow-frontend-to-backend.yaml
+	kubectl apply -f manifests/network-policies/smoke-tests/apps/allow-backend-to-database.yaml
+	kubectl apply -f manifests/network-policies/smoke-tests/apps/allow-external-egress.yaml
+
+network-policies-smoke-policies-verify:
+	kubectl get networkpolicy -n apps
+
+network-policies-smoke-apply:
+	kubectl apply -f manifests/network-policy-smoke-test.yaml
+	kubectl -n apps rollout status deployment/netpol-backend --timeout=120s
+	kubectl -n apps rollout status deployment/netpol-database --timeout=120s
+	kubectl wait --for=condition=Ready pod/netpol-frontend-client -n apps --timeout=120s
+	kubectl wait --for=condition=Ready pod/netpol-backend-client -n apps --timeout=120s
+	kubectl wait --for=condition=Ready pod/netpol-blocked-client -n apps --timeout=120s
+
+network-policies-smoke-verify:
+	kubectl exec -n apps netpol-frontend-client -- wget -qO- -T 5 http://netpol-backend.apps.svc.cluster.local
+	! kubectl exec -n apps netpol-blocked-client -- wget -qO- -T 5 http://netpol-backend.apps.svc.cluster.local
+	kubectl exec -n apps netpol-backend-client -- sh -c "printf 'PING\r\n' | nc -w 5 netpol-database.apps.svc.cluster.local 6379 | grep PONG"
+	! kubectl exec -n apps netpol-blocked-client -- sh -c "printf 'PING\r\n' | nc -w 5 netpol-database.apps.svc.cluster.local 6379 | grep PONG"
+
+network-policies-smoke-delete:
+	kubectl delete -f manifests/network-policy-smoke-test.yaml --ignore-not-found=true
