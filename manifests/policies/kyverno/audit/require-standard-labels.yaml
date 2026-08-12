@@ -20,7 +20,8 @@ spec:
                 - sandbox
       validate:
         failureAction: Audit
-        message: Workloads must include standard app and PlatformOne ownership labels.
+        message: >-
+          Workloads must include standard app and PlatformOne ownership labels.
         pattern:
           metadata:
             labels:

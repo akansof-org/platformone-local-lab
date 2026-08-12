@@ -1,5 +1,4 @@
 name: YAML Check
-
 on:
   pull_request:
   push:
@@ -9,4 +8,3 @@ on:
 jobs:
   yaml:
     uses: akansof-org/.github/.github/workflows/reusable-yaml-check.yml@main
-

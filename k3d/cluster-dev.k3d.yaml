@@ -1,7 +1,7 @@
 apiVersion: k3d.io/v1alpha5
 kind: Simple
 metadata:
-  name: dev # cluster will be named "k3d-dev"
+  name: dev  # cluster will be named "k3d-dev"
 
 servers: 1
 agents: 2
@@ -26,9 +26,10 @@ registries:
     host: "0.0.0.0"
     hostPort: "7445"
     volumes:
-      - /Users/aankansah/Code/akansof/09-runtime/local-registry/k3d-dev:/var/lib/registry
+      - "/Users/aankansah/Code/akansof/09-runtime/local-registry/\
+        k3d-dev:/var/lib/registry"
 
-# Common host->node mounts (keeps repos clean and puts runtime data in 09-runtime)
+# Common host->node mounts.
 volumes:
   - volume: /Users/aankansah/Code/akansof/09-runtime/kubeconfigs:/kubeconfigs
     nodeFilters:
