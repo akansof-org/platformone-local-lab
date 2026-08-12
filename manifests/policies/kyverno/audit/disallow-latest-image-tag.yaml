@@ -1,0 +1,55 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-image-tag
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/policy-mode: audit
+spec:
+  background: true
+  emitWarning: true
+  rules:
+    - name: require-image-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - apps
+                - sandbox
+      failureAction: Audit
+      validate:
+        message: Container images must use an explicit tag.
+        foreach:
+          - list: "request.object.spec.containers"
+            pattern:
+              image: "*:*"
+          - list: "request.object.spec.initContainers"
+            pattern:
+              image: "*:*"
+          - list: "request.object.spec.ephemeralContainers"
+            pattern:
+              image: "*:*"
+    - name: disallow-latest-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - apps
+                - sandbox
+      failureAction: Audit
+      validate:
+        message: Container images must not use the mutable latest tag.
+        foreach:
+          - list: "request.object.spec.containers"
+            pattern:
+              image: "!*:latest"
+          - list: "request.object.spec.initContainers"
+            pattern:
+              image: "!*:latest"
+          - list: "request.object.spec.ephemeralContainers"
+            pattern:
+              image: "!*:latest"

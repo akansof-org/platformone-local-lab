@@ -1,0 +1,29 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-standard-labels
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/policy-mode: audit
+spec:
+  background: true
+  emitWarning: true
+  rules:
+    - name: require-platformone-and-app-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - apps
+                - sandbox
+      validate:
+        failureAction: Audit
+        message: Workloads must include standard app and PlatformOne ownership labels.
+        pattern:
+          metadata:
+            labels:
+              app.kubernetes.io/name: "?*"
+              app.kubernetes.io/part-of: "?*"
+              platformone.io/owner: "?*"

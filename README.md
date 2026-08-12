@@ -102,6 +102,13 @@ Use `make cluster-prereqs` to verify the tools and print their versions.
 | `make guardrails-verify` | Verifies namespace resource guardrails. |
 | `make rbac-apply` | Applies the namespace RBAC scaffold. |
 | `make rbac-verify` | Verifies the implemented RBAC resources. |
+| `make kyverno-install` | Installs Kyverno into its dedicated namespace. |
+| `make kyverno-verify` | Verifies Kyverno namespace, pods, and CRDs. |
+| `make policy-audit-apply` | Applies audit-mode Kyverno policies. |
+| `make policy-audit-verify` | Lists installed Kyverno ClusterPolicies. |
+| `make policy-reports` | Lists Kyverno policy reports. |
+| `make policy-smoke-apply` | Applies good and bad policy smoke fixtures. |
+| `make policy-smoke-delete` | Deletes policy smoke fixtures. |
 | `make cluster-down` | Deletes the `dev` k3d cluster while preserving runtime data for inspection. |
 | `make cluster-reset` | Deletes, recreates, and validates the cluster. |
 
@@ -262,6 +269,40 @@ make rbac-verify
 ```
 
 The current manifests implement the RBAC pattern for all managed platform namespaces. `make rbac-apply` applies the RBAC tree recursively.
+
+## Policy Strategy
+
+The local policy engine is Kyverno. Kyverno is installed into a dedicated namespace:
+
+```text
+kyverno
+```
+
+Audit-mode policies are defined in:
+
+```text
+manifests/policies/kyverno/audit/
+```
+
+The detailed policy strategy lives in:
+
+```text
+docs/policy/local-policy-strategy.md
+```
+
+Install Kyverno, apply audit policies, and inspect reports with:
+
+```bash
+make kyverno-install
+make kyverno-verify
+make policy-audit-apply
+make policy-audit-verify
+make policy-smoke-apply
+make policy-reports
+make policy-smoke-delete
+```
+
+Audit mode allows resources to be created while Kyverno reports violations. Policies are promoted to enforce mode only after findings are understood, false positives are resolved, smoke tests exist, and local platform workloads comply.
 
 ## Network Policy Strategy
 

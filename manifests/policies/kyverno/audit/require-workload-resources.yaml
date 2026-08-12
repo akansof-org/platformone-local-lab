@@ -1,0 +1,39 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-workload-resources
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/policy-mode: audit
+spec:
+  background: true
+  emitWarning: true
+  rules:
+    - name: require-container-requests-and-limits
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - apps
+                - sandbox
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kyverno
+      validate:
+        failureAction: Audit
+        message: Containers must define CPU and memory requests and limits.
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  requests:
+                    cpu: "?*"
+                    memory: "?*"
+                  limits:
+                    cpu: "?*"
+                    memory: "?*"

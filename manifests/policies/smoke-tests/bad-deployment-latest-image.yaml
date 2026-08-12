@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kyverno-bad-latest-image
+  namespace: sandbox
+  labels:
+    app.kubernetes.io/name: kyverno-bad-latest-image
+    app.kubernetes.io/part-of: policy-smoke
+    platformone.io/owner: platform-engineering
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kyverno-bad-latest-image
+      app.kubernetes.io/part-of: policy-smoke
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kyverno-bad-latest-image
+        app.kubernetes.io/part-of: policy-smoke
+        platformone.io/owner: platform-engineering
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi

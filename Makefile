@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify rbac-apply rbac-verify network-policies-smoke-policies-apply network-policies-smoke-policies-verify network-policies-smoke-apply network-policies-smoke-verify network-policies-smoke-delete
+.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify rbac-apply rbac-verify kyverno-install kyverno-verify policy-audit-apply policy-audit-verify policy-reports policy-smoke-apply policy-smoke-delete network-policies-smoke-policies-apply network-policies-smoke-policies-verify network-policies-smoke-apply network-policies-smoke-verify network-policies-smoke-delete
 
 cluster-prereqs:
 	./scripts/cluster/prereqs.sh
@@ -96,6 +96,37 @@ rbac-verify:
 	kubectl get role,rolebinding -n gitops
 	kubectl get role,rolebinding -n platformone-system
 	kubectl get role,rolebinding -n sandbox
+
+kyverno-install:
+	helm repo add kyverno https://kyverno.github.io/kyverno/
+	helm repo update
+	helm upgrade --install kyverno kyverno/kyverno --namespace kyverno --create-namespace --set config.webhooks.forceFailurePolicyIgnore.enabled=true
+
+kyverno-verify:
+	kubectl get namespace kyverno
+	kubectl get pods -n kyverno
+	kubectl -n kyverno rollout status deployment/kyverno-admission-controller --timeout=180s
+	kubectl -n kyverno rollout status deployment/kyverno-background-controller --timeout=180s
+	kubectl -n kyverno rollout status deployment/kyverno-cleanup-controller --timeout=180s
+	kubectl -n kyverno rollout status deployment/kyverno-reports-controller --timeout=180s
+	kubectl get crd clusterpolicies.kyverno.io
+	kubectl get crd policyreports.wgpolicyk8s.io
+
+policy-audit-apply:
+	kubectl apply -f manifests/policies/kyverno/audit/
+
+policy-audit-verify:
+	kubectl get clusterpolicy
+
+policy-reports:
+	kubectl get policyreport -A
+	kubectl get clusterpolicyreport
+
+policy-smoke-apply:
+	kubectl apply -f manifests/policies/smoke-tests/
+
+policy-smoke-delete:
+	kubectl delete -f manifests/policies/smoke-tests/ --ignore-not-found=true
 
 network-policies-smoke-policies-apply:
 	kubectl apply -f manifests/network-policies/baseline/default-deny-ingress.yaml
