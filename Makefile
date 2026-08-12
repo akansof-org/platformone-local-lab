@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify rbac-apply rbac-verify kyverno-install kyverno-verify policy-audit-apply policy-audit-verify policy-reports policy-smoke-apply policy-smoke-delete network-policies-smoke-policies-apply network-policies-smoke-policies-verify network-policies-smoke-apply network-policies-smoke-verify network-policies-smoke-delete
+.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify rbac-apply rbac-verify ingress-verify cert-manager-install cert-manager-verify cert-manager-remove cert-manager-recover metrics-server-install metrics-server-verify metrics-server-remove metrics-server-recover kyverno-install kyverno-verify kyverno-remove kyverno-recover platform-components-install platform-components-verify platform-components-remove platform-components-recover policy-audit-apply policy-audit-verify policy-reports policy-smoke-apply policy-smoke-delete network-policies-smoke-policies-apply network-policies-smoke-policies-verify network-policies-smoke-apply network-policies-smoke-verify network-policies-smoke-delete
 
 cluster-prereqs:
 	./scripts/cluster/prereqs.sh
@@ -97,6 +97,44 @@ rbac-verify:
 	kubectl get role,rolebinding -n platformone-system
 	kubectl get role,rolebinding -n sandbox
 
+ingress-verify:
+	kubectl get deployment traefik -n kube-system
+	kubectl -n kube-system rollout status deployment/traefik --timeout=120s
+	kubectl get ingressclass
+
+cert-manager-install:
+	helm upgrade --install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.20.3 --namespace cert-manager --create-namespace --set crds.enabled=true
+
+cert-manager-verify:
+	kubectl get namespace cert-manager
+	kubectl -n cert-manager rollout status deployment/cert-manager --timeout=180s
+	kubectl -n cert-manager rollout status deployment/cert-manager-cainjector --timeout=180s
+	kubectl -n cert-manager rollout status deployment/cert-manager-webhook --timeout=180s
+	kubectl get crd certificates.cert-manager.io
+	kubectl get crd issuers.cert-manager.io
+	kubectl get crd clusterissuers.cert-manager.io
+
+cert-manager-remove:
+	helm uninstall cert-manager -n cert-manager --ignore-not-found
+
+cert-manager-recover: cert-manager-install cert-manager-verify
+
+metrics-server-install:
+	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+	helm repo update
+	helm upgrade --install metrics-server metrics-server/metrics-server --namespace kube-system --values helm-values/metrics-server/k3d-local.yaml
+
+metrics-server-verify:
+	kubectl get deployment metrics-server -n kube-system
+	kubectl -n kube-system rollout status deployment/metrics-server --timeout=180s
+	kubectl get apiservice v1beta1.metrics.k8s.io
+	kubectl top nodes
+
+metrics-server-remove:
+	helm uninstall metrics-server -n kube-system --ignore-not-found
+
+metrics-server-recover: metrics-server-install metrics-server-verify
+
 kyverno-install:
 	helm repo add kyverno https://kyverno.github.io/kyverno/
 	helm repo update
@@ -111,6 +149,19 @@ kyverno-verify:
 	kubectl -n kyverno rollout status deployment/kyverno-reports-controller --timeout=180s
 	kubectl get crd clusterpolicies.kyverno.io
 	kubectl get crd policyreports.wgpolicyk8s.io
+
+kyverno-remove:
+	helm uninstall kyverno -n kyverno --ignore-not-found
+
+kyverno-recover: kyverno-install kyverno-verify policy-audit-apply
+
+platform-components-install: cert-manager-install metrics-server-install kyverno-install
+
+platform-components-verify: ingress-verify cert-manager-verify metrics-server-verify kyverno-verify namespaces-verify guardrails-verify rbac-verify
+
+platform-components-remove: cert-manager-remove metrics-server-remove kyverno-remove
+
+platform-components-recover: platform-components-install platform-components-verify policy-audit-apply
 
 policy-audit-apply:
 	kubectl apply -f manifests/policies/kyverno/audit/

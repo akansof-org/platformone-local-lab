@@ -102,8 +102,20 @@ Use `make cluster-prereqs` to verify the tools and print their versions.
 | `make guardrails-verify` | Verifies namespace resource guardrails. |
 | `make rbac-apply` | Applies the namespace RBAC scaffold. |
 | `make rbac-verify` | Verifies the implemented RBAC resources. |
+| `make ingress-verify` | Verifies the built-in Traefik ingress controller. |
+| `make cert-manager-install` | Installs cert-manager with Helm. |
+| `make cert-manager-verify` | Verifies cert-manager controllers and CRDs. |
+| `make cert-manager-remove` | Uninstalls the cert-manager Helm release. |
+| `make metrics-server-install` | Installs Metrics Server with Helm. |
+| `make metrics-server-verify` | Verifies Metrics Server and `kubectl top nodes`. |
+| `make metrics-server-remove` | Uninstalls the Metrics Server Helm release. |
 | `make kyverno-install` | Installs Kyverno into its dedicated namespace. |
 | `make kyverno-verify` | Verifies Kyverno namespace, pods, and CRDs. |
+| `make kyverno-remove` | Uninstalls the Kyverno Helm release. |
+| `make platform-components-install` | Installs the Helm-managed minimum platform components. |
+| `make platform-components-verify` | Verifies the minimum platform component set. |
+| `make platform-components-remove` | Removes Helm-managed platform components. |
+| `make platform-components-recover` | Reinstalls and verifies Helm-managed platform components, then reapplies audit policies. |
 | `make policy-audit-apply` | Applies audit-mode Kyverno policies. |
 | `make policy-audit-verify` | Lists installed Kyverno ClusterPolicies. |
 | `make policy-reports` | Lists Kyverno policy reports. |
@@ -270,6 +282,34 @@ make rbac-verify
 
 The current manifests implement the RBAC pattern for all managed platform namespaces. `make rbac-apply` applies the RBAC tree recursively.
 
+## Platform Components
+
+The minimum local platform component set is documented in:
+
+```text
+platform/local-platform-components.md
+```
+
+The set intentionally stays small:
+
+```text
+Ingress
+cert-manager
+Metrics Server
+Kyverno
+Namespace standards
+Local registry integration
+```
+
+Install and verify the Helm-managed components with:
+
+```bash
+make platform-components-install
+make platform-components-verify
+```
+
+The component runbook records ownership, removal, and recovery for each platform component.
+
 ## Policy Strategy
 
 The local policy engine is Kyverno. Kyverno is installed into a dedicated namespace:
@@ -313,6 +353,8 @@ manifests/network-policies/
 ├── baseline/
 │   └── default-deny-ingress.yaml
 ├── platform/
+├── smoke-tests/
+│   └── apps/
 └── namespaces/
     ├── apps/
     ├── gitops/
@@ -327,7 +369,7 @@ The detailed network policy strategy lives in:
 networking/local-network-policy-strategy.md
 ```
 
-The current starter policy defines default-deny ingress for the managed platform namespaces. It is intentionally not wired into a Make target yet, so network policy enforcement is not applied accidentally before allow rules and smoke tests are ready.
+The baseline policy defines default-deny ingress for the managed platform namespaces. The app-specific allow policies currently live under `smoke-tests/apps/` because they exist to prove NetworkPolicy behavior, not to model a real application yet.
 
 ## Storage Strategy
 
