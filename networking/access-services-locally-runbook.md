@@ -116,7 +116,7 @@ http://test.platformone.local:8080
 The standard smoke manifest is:
 
 ```text
-manifests/smoke-test.yaml
+manifests/ingress-smoke-test.yaml
 ```
 
 It creates:

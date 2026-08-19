@@ -106,6 +106,24 @@ Verify:
 make cert-manager-verify
 ```
 
+Smoke test:
+
+```bash
+make cert-manager-smoke-apply
+make cert-manager-smoke-verify
+make cert-manager-smoke-delete
+```
+
+The smoke test creates:
+
+```text
+ClusterIssuer/platformone-selfsigned-smoke
+Certificate/sandbox/cert-manager-smoke-cert
+Secret/sandbox/cert-manager-smoke-tls
+```
+
+This proves cert-manager can reconcile a `Certificate` resource and produce a Kubernetes TLS Secret. It does not prove browser-trusted local TLS.
+
 Remove:
 
 ```bash

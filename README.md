@@ -106,6 +106,9 @@ Use `make cluster-prereqs` to verify the tools and print their versions.
 | `make cert-manager-install` | Installs cert-manager with Helm. |
 | `make cert-manager-verify` | Verifies cert-manager controllers and CRDs. |
 | `make cert-manager-remove` | Uninstalls the cert-manager Helm release. |
+| `make cert-manager-smoke-apply` | Issues a local self-signed cert-manager smoke certificate. |
+| `make cert-manager-smoke-verify` | Verifies the smoke Certificate, CertificateRequest, and TLS Secret. |
+| `make cert-manager-smoke-delete` | Deletes the cert-manager smoke resources. |
 | `make metrics-server-install` | Installs Metrics Server with Helm. |
 | `make metrics-server-verify` | Verifies Metrics Server and `kubectl top nodes`. |
 | `make metrics-server-remove` | Uninstalls the Metrics Server Helm release. |
@@ -429,7 +432,7 @@ networking/access-services-locally-runbook.md
 The reusable Traefik smoke manifest lives in:
 
 ```text
-manifests/smoke-test.yaml
+manifests/ingress-smoke-test.yaml
 ```
 
 Apply it with:

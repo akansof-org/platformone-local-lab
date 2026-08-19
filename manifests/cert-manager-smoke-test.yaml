@@ -1,0 +1,29 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: platformone-selfsigned-smoke
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/smoke-test: cert-manager
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cert-manager-smoke-cert
+  namespace: sandbox
+  labels:
+    platformone.io/managed-by: platformone-local-lab
+    platformone.io/smoke-test: cert-manager
+spec:
+  secretName: cert-manager-smoke-tls
+  duration: 24h
+  renewBefore: 12h
+  commonName: cert-manager-smoke.platformone.local
+  dnsNames:
+    - cert-manager-smoke.platformone.local
+  issuerRef:
+    name: platformone-selfsigned-smoke
+    kind: ClusterIssuer
+    group: cert-manager.io

@@ -71,7 +71,7 @@ cluster-verify
 The ingress smoke test uses:
 
 ```text
-manifests/smoke-test.yaml
+manifests/ingress-smoke-test.yaml
 ```
 
 The storage smoke test uses:

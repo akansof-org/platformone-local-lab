@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify rbac-apply rbac-verify ingress-verify cert-manager-install cert-manager-verify cert-manager-remove cert-manager-recover metrics-server-install metrics-server-verify metrics-server-remove metrics-server-recover kyverno-install kyverno-verify kyverno-remove kyverno-recover platform-components-install platform-components-verify platform-components-remove platform-components-recover policy-audit-apply policy-audit-verify policy-reports policy-smoke-apply policy-smoke-delete network-policies-smoke-policies-apply network-policies-smoke-policies-verify network-policies-smoke-apply network-policies-smoke-verify network-policies-smoke-delete
+.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify rbac-apply rbac-verify ingress-verify cert-manager-install cert-manager-verify cert-manager-remove cert-manager-recover cert-manager-smoke-apply cert-manager-smoke-verify cert-manager-smoke-delete metrics-server-install metrics-server-verify metrics-server-remove metrics-server-recover kyverno-install kyverno-verify kyverno-remove kyverno-recover platform-components-install platform-components-verify platform-components-remove platform-components-recover policy-audit-apply policy-audit-verify policy-reports policy-smoke-apply policy-smoke-delete network-policies-smoke-policies-apply network-policies-smoke-policies-verify network-policies-smoke-apply network-policies-smoke-verify network-policies-smoke-delete
 
 cluster-prereqs:
 	./scripts/cluster/prereqs.sh
@@ -30,7 +30,7 @@ cluster-health: cluster-verify
 	$(MAKE) storage-delete
 
 smoke-apply:
-	kubectl apply -f manifests/smoke-test.yaml
+	kubectl apply -f manifests/ingress-smoke-test.yaml
 
 smoke-verify:
 	kubectl get pods -l app=smoke-echo
@@ -38,7 +38,7 @@ smoke-verify:
 	curl -i -H "Host: test.platformone.local" http://127.0.0.1:8080
 
 smoke-delete:
-	kubectl delete -f manifests/smoke-test.yaml --ignore-not-found=true
+	kubectl delete -f manifests/ingress-smoke-test.yaml --ignore-not-found=true
 
 storage-apply:
 	kubectl apply -f manifests/storage-smoke-test.yaml
@@ -118,6 +118,19 @@ cert-manager-remove:
 	helm uninstall cert-manager -n cert-manager --ignore-not-found
 
 cert-manager-recover: cert-manager-install cert-manager-verify
+
+cert-manager-smoke-apply:
+	kubectl apply -f manifests/cert-manager-smoke-test.yaml
+	kubectl wait --for=condition=Ready certificate/cert-manager-smoke-cert -n sandbox --timeout=120s
+
+cert-manager-smoke-verify:
+	kubectl get clusterissuer platformone-selfsigned-smoke
+	kubectl get certificate cert-manager-smoke-cert -n sandbox
+	kubectl get certificaterequest -n sandbox
+	kubectl get secret cert-manager-smoke-tls -n sandbox
+
+cert-manager-smoke-delete:
+	kubectl delete -f manifests/cert-manager-smoke-test.yaml --ignore-not-found=true
 
 metrics-server-install:
 	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/

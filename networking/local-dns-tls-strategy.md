@@ -103,7 +103,7 @@ test.platformone.local
 The reusable manifest is:
 
 ```text
-manifests/smoke-test.yaml
+manifests/ingress-smoke-test.yaml
 ```
 
 It creates a `traefik/whoami` Deployment, Service, and Ingress for `test.platformone.local`.
