@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify rbac-apply rbac-verify ingress-verify cert-manager-install cert-manager-verify cert-manager-remove cert-manager-recover cert-manager-smoke-apply cert-manager-smoke-verify cert-manager-smoke-delete metrics-server-install metrics-server-verify metrics-server-remove metrics-server-recover kyverno-install kyverno-verify kyverno-remove kyverno-recover platform-components-install platform-components-verify platform-components-remove platform-components-recover policy-audit-apply policy-audit-verify policy-reports policy-smoke-apply policy-smoke-delete network-policies-smoke-policies-apply network-policies-smoke-policies-verify network-policies-smoke-apply network-policies-smoke-verify network-policies-smoke-delete
+.PHONY: cluster-prereqs cluster-up cluster-verify cluster-down cluster-reset cluster-health smoke-apply smoke-verify smoke-delete storage-apply storage-verify storage-restart storage-delete namespaces-apply namespaces-verify guardrails-apply guardrails-verify rbac-apply rbac-verify ingress-verify cert-manager-install cert-manager-verify cert-manager-remove cert-manager-recover cert-manager-smoke-apply cert-manager-smoke-verify cert-manager-smoke-delete metrics-server-install metrics-server-verify metrics-server-remove metrics-server-recover kyverno-install kyverno-verify kyverno-remove kyverno-recover argocd-install argocd-verify argocd-password argocd-port-forward argocd-remove argocd-recover platform-components-install platform-components-verify platform-components-remove platform-components-recover policy-audit-apply policy-audit-verify policy-reports policy-smoke-apply policy-smoke-delete network-policies-smoke-policies-apply network-policies-smoke-policies-verify network-policies-smoke-apply network-policies-smoke-verify network-policies-smoke-delete
 
 cluster-prereqs:
 	./scripts/cluster/prereqs.sh
@@ -167,6 +167,31 @@ kyverno-remove:
 	helm uninstall kyverno -n kyverno --ignore-not-found
 
 kyverno-recover: kyverno-install kyverno-verify policy-audit-apply
+
+argocd-install:
+	helm repo add argo https://argoproj.github.io/argo-helm
+	helm repo update
+	helm upgrade --install argocd argo/argo-cd --namespace gitops --create-namespace --values helm-values/argocd/local.yaml
+
+argocd-verify:
+	kubectl get namespace gitops
+	kubectl get pods -n gitops
+	kubectl -n gitops rollout status deployment/argocd-server --timeout=180s
+	kubectl -n gitops rollout status deployment/argocd-repo-server --timeout=180s
+	kubectl -n gitops rollout status deployment/argocd-redis --timeout=180s
+	kubectl -n gitops rollout status statefulset/argocd-application-controller --timeout=180s
+
+argocd-password:
+	@echo "ArgoCD initial admin password:"
+	@kubectl get secret argocd-initial-admin-secret -n gitops -o jsonpath="{.data.password}" | base64 --decode; echo
+
+argocd-port-forward:
+	kubectl port-forward svc/argocd-server -n gitops 8081:443
+
+argocd-remove:
+	helm uninstall argocd -n gitops --ignore-not-found
+
+argocd-recover: argocd-install argocd-verify
 
 platform-components-install: cert-manager-install metrics-server-install kyverno-install
 

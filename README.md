@@ -52,18 +52,18 @@ make cluster-reset
 
 The standard cluster profile is defined in `k3d/cluster-dev.k3d.yaml`.
 
-| Setting | Value |
-| --- | --- |
-| Cluster name | `dev` |
-| Kubernetes context | `k3d-dev` |
-| Distribution | `k3d` / `k3s` |
-| Servers | `1` |
-| Agents | `2` |
-| Kubernetes image | `rancher/k3s:v1.35.2-k3s1` |
-| API endpoint | `127.0.0.1:6445` |
-| HTTP ingress | `127.0.0.1:8080` |
-| HTTPS ingress | `127.0.0.1:8443` |
-| Local registry | `registry.localhost:7445` |
+| Setting            | Value                        |
+| ------------------ | ---------------------------- |
+| Cluster name       | `dev`                      |
+| Kubernetes context | `k3d-dev`                  |
+| Distribution       | `k3d` / `k3s`            |
+| Servers            | `1`                        |
+| Agents             | `2`                        |
+| Kubernetes image   | `rancher/k3s:v1.35.2-k3s1` |
+| API endpoint       | `127.0.0.1:6445`           |
+| HTTP ingress       | `127.0.0.1:8080`           |
+| HTTPS ingress      | `127.0.0.1:8443`           |
+| Local registry     | `registry.localhost:7445`  |
 
 The create workflow also creates these baseline namespaces:
 
@@ -78,54 +78,60 @@ apps
 
 The lifecycle scripts expect:
 
-| Tool | Purpose |
-| --- | --- |
-| Docker | Runs the local k3d node and registry containers. |
-| k3d | Creates and manages the laptop Kubernetes cluster. |
-| kubectl | Validates and operates the cluster. |
-| helm | Reserved for add-on installs and future bootstrap work. |
-| curl | Verifies local ingress reachability. |
+| Tool    | Purpose                                                 |
+| ------- | ------------------------------------------------------- |
+| Docker  | Runs the local k3d node and registry containers.        |
+| k3d     | Creates and manages the laptop Kubernetes cluster.      |
+| kubectl | Validates and operates the cluster.                     |
+| helm    | Reserved for add-on installs and future bootstrap work. |
+| curl    | Verifies local ingress reachability.                    |
 
 Use `make cluster-prereqs` to verify the tools and print their versions.
 
 ## Make Targets
 
-| Target | What it does |
-| --- | --- |
-| `make cluster-prereqs` | Verifies required commands and Docker daemon access. |
-| `make cluster-up` | Creates the `dev` cluster from `k3d/cluster-dev.k3d.yaml`; exits cleanly if it already exists. |
-| `make cluster-verify` | Runs node, core pod, DNS, and ingress smoke checks. |
-| `make cluster-health` | Runs baseline, ingress, and storage health checks. |
-| `make namespaces-apply` | Applies the local platform namespace baseline. |
-| `make namespaces-verify` | Verifies the managed namespace labels and expected namespaces. |
-| `make guardrails-apply` | Applies ResourceQuota and LimitRange guardrails. |
-| `make guardrails-verify` | Verifies namespace resource guardrails. |
-| `make rbac-apply` | Applies the namespace RBAC scaffold. |
-| `make rbac-verify` | Verifies the implemented RBAC resources. |
-| `make ingress-verify` | Verifies the built-in Traefik ingress controller. |
-| `make cert-manager-install` | Installs cert-manager with Helm. |
-| `make cert-manager-verify` | Verifies cert-manager controllers and CRDs. |
-| `make cert-manager-remove` | Uninstalls the cert-manager Helm release. |
-| `make cert-manager-smoke-apply` | Issues a local self-signed cert-manager smoke certificate. |
-| `make cert-manager-smoke-verify` | Verifies the smoke Certificate, CertificateRequest, and TLS Secret. |
-| `make cert-manager-smoke-delete` | Deletes the cert-manager smoke resources. |
-| `make metrics-server-install` | Installs Metrics Server with Helm. |
-| `make metrics-server-verify` | Verifies Metrics Server and `kubectl top nodes`. |
-| `make metrics-server-remove` | Uninstalls the Metrics Server Helm release. |
-| `make kyverno-install` | Installs Kyverno into its dedicated namespace. |
-| `make kyverno-verify` | Verifies Kyverno namespace, pods, and CRDs. |
-| `make kyverno-remove` | Uninstalls the Kyverno Helm release. |
-| `make platform-components-install` | Installs the Helm-managed minimum platform components. |
-| `make platform-components-verify` | Verifies the minimum platform component set. |
-| `make platform-components-remove` | Removes Helm-managed platform components. |
-| `make platform-components-recover` | Reinstalls and verifies Helm-managed platform components, then reapplies audit policies. |
-| `make policy-audit-apply` | Applies audit-mode Kyverno policies. |
-| `make policy-audit-verify` | Lists installed Kyverno ClusterPolicies. |
-| `make policy-reports` | Lists Kyverno policy reports. |
-| `make policy-smoke-apply` | Applies good and bad policy smoke fixtures. |
-| `make policy-smoke-delete` | Deletes policy smoke fixtures. |
-| `make cluster-down` | Deletes the `dev` k3d cluster while preserving runtime data for inspection. |
-| `make cluster-reset` | Deletes, recreates, and validates the cluster. |
+| Target                               | What it does                                                                                      |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `make cluster-prereqs`             | Verifies required commands and Docker daemon access.                                              |
+| `make cluster-up`                  | Creates the`dev` cluster from `k3d/cluster-dev.k3d.yaml`; exits cleanly if it already exists. |
+| `make cluster-verify`              | Runs node, core pod, DNS, and ingress smoke checks.                                               |
+| `make cluster-health`              | Runs baseline, ingress, and storage health checks.                                                |
+| `make namespaces-apply`            | Applies the local platform namespace baseline.                                                    |
+| `make namespaces-verify`           | Verifies the managed namespace labels and expected namespaces.                                    |
+| `make guardrails-apply`            | Applies ResourceQuota and LimitRange guardrails.                                                  |
+| `make guardrails-verify`           | Verifies namespace resource guardrails.                                                           |
+| `make rbac-apply`                  | Applies the namespace RBAC scaffold.                                                              |
+| `make rbac-verify`                 | Verifies the implemented RBAC resources.                                                          |
+| `make ingress-verify`              | Verifies the built-in Traefik ingress controller.                                                 |
+| `make cert-manager-install`        | Installs cert-manager with Helm.                                                                  |
+| `make cert-manager-verify`         | Verifies cert-manager controllers and CRDs.                                                       |
+| `make cert-manager-remove`         | Uninstalls the cert-manager Helm release.                                                         |
+| `make cert-manager-smoke-apply`    | Issues a local self-signed cert-manager smoke certificate.                                        |
+| `make cert-manager-smoke-verify`   | Verifies the smoke Certificate, CertificateRequest, and TLS Secret.                               |
+| `make cert-manager-smoke-delete`   | Deletes the cert-manager smoke resources.                                                         |
+| `make metrics-server-install`      | Installs Metrics Server with Helm.                                                                |
+| `make metrics-server-verify`       | Verifies Metrics Server and`kubectl top nodes`.                                                 |
+| `make metrics-server-remove`       | Uninstalls the Metrics Server Helm release.                                                       |
+| `make kyverno-install`             | Installs Kyverno into its dedicated namespace.                                                    |
+| `make kyverno-verify`              | Verifies Kyverno namespace, pods, and CRDs.                                                       |
+| `make kyverno-remove`              | Uninstalls the Kyverno Helm release.                                                              |
+| `make argocd-install`              | Installs Argo CD into the`gitops` namespace.                                                    |
+| `make argocd-verify`               | Verifies the local Argo CD control plane.                                                         |
+| `make argocd-password`             | Prints the initial Argo CD admin password.                                                        |
+| `make argocd-port-forward`         | Exposes the Argo CD API/UI on`https://localhost:8081`.                                          |
+| `make argocd-remove`               | Uninstalls the Argo CD Helm release.                                                              |
+| `make argocd-recover`              | Reinstalls and verifies Argo CD.                                                                  |
+| `make platform-components-install` | Installs the Helm-managed minimum platform components.                                            |
+| `make platform-components-verify`  | Verifies the minimum platform component set.                                                      |
+| `make platform-components-remove`  | Removes Helm-managed platform components.                                                         |
+| `make platform-components-recover` | Reinstalls and verifies Helm-managed platform components, then reapplies audit policies.          |
+| `make policy-audit-apply`          | Applies audit-mode Kyverno policies.                                                              |
+| `make policy-audit-verify`         | Lists installed Kyverno ClusterPolicies.                                                          |
+| `make policy-reports`              | Lists Kyverno policy reports.                                                                     |
+| `make policy-smoke-apply`          | Applies good and bad policy smoke fixtures.                                                       |
+| `make policy-smoke-delete`         | Deletes policy smoke fixtures.                                                                    |
+| `make cluster-down`                | Deletes the`dev` k3d cluster while preserving runtime data for inspection.                      |
+| `make cluster-reset`               | Deletes, recreates, and validates the cluster.                                                    |
 
 ## Script Layout
 
@@ -145,11 +151,11 @@ The `Makefile` is the normal operator interface. The scripts can also be run dir
 
 Runtime files are kept outside this repository, under the workspace-level `09-runtime` directory:
 
-| Path | Purpose |
-| --- | --- |
-| `../../09-runtime/kubeconfigs` | Dedicated generated kubeconfigs. |
-| `../../09-runtime/generated-config` | Generated local configuration files. |
-| `../../09-runtime/local-registry/k3d-dev` | Local registry storage. |
+| Path                                        | Purpose                              |
+| ------------------------------------------- | ------------------------------------ |
+| `../../09-runtime/kubeconfigs`            | Dedicated generated kubeconfigs.     |
+| `../../09-runtime/generated-config`       | Generated local configuration files. |
+| `../../09-runtime/local-registry/k3d-dev` | Local registry storage.              |
 
 `make cluster-down` preserves these directories. This is intentional, because they can be useful when debugging cluster lifecycle problems.
 
@@ -312,6 +318,40 @@ make platform-components-verify
 ```
 
 The component runbook records ownership, removal, and recovery for each platform component.
+
+## GitOps Bootstrap
+
+The local GitOps controller is Argo CD. It is installed with Helm into the
+managed `gitops` namespace using:
+
+```text
+helm-values/dargocd/local.yaml
+```
+
+The detailed bootstrap runbook lives in:
+
+```text
+gitops/local-argocd-bootstrap.md
+```
+
+Install, verify, and access Argo CD with:
+
+```bash
+make namespaces-apply
+make argocd-install
+make argocd-verify
+make argocd-password
+make argocd-port-forward
+```
+
+The local UI is available at:
+
+```text
+https://localhost:8081
+```
+
+Port `8081` is used for Argo CD because port `8080` is reserved for local
+Traefik ingress traffic.
 
 ## Policy Strategy
 
@@ -488,13 +528,13 @@ health/cluster-health-checks.md
 
 For durable changes, edit source-controlled config or scripts, then recreate the cluster.
 
-| Change | Preferred workflow |
-| --- | --- |
-| Add or remove worker nodes | Edit `agents` in `k3d/cluster-dev.k3d.yaml`, then run `make cluster-reset`. |
-| Change API or ingress ports | Edit `kubeAPI` or `ports`, then run `make cluster-reset`. |
-| Upgrade Kubernetes/k3s | Edit the `image` tag, then run `make cluster-reset`. |
-| Add required namespaces | Update `scripts/cluster/create.sh`, then run `make cluster-reset`. |
-| Add required add-ons | Add scripted or GitOps-managed install steps, then run `make cluster-reset`. |
+| Change                      | Preferred workflow                                                               |
+| --------------------------- | -------------------------------------------------------------------------------- |
+| Add or remove worker nodes  | Edit`agents` in `k3d/cluster-dev.k3d.yaml`, then run `make cluster-reset`. |
+| Change API or ingress ports | Edit`kubeAPI` or `ports`, then run `make cluster-reset`.                   |
+| Upgrade Kubernetes/k3s      | Edit the`image` tag, then run `make cluster-reset`.                          |
+| Add required namespaces     | Update`scripts/cluster/create.sh`, then run `make cluster-reset`.            |
+| Add required add-ons        | Add scripted or GitOps-managed install steps, then run`make cluster-reset`.    |
 
 Use in-place cluster changes only for short experiments. If the change should survive a rebuild, capture it in this repo.
 
@@ -566,6 +606,12 @@ The fuller local cluster lifecycle runbook lives in:
 
 ```text
 ../platformone-docs/docs/engineering/local-cluster-lifecycle.md
+```
+
+The collaboration guidance spec for engineer-led implementation lives in:
+
+```text
+docs/collaboration/implementation-guidance-spec.md
 ```
 
 ## Ownership

@@ -12,8 +12,9 @@ PlatformOne keeps the local k3d platform intentionally small. The goal is to ins
 | Kyverno | `kyverno` | `security-engineering` | Helm | Runs audit-first admission policy checks. |
 | Namespace standards | Cluster-scoped and managed namespaces | `platform-engineering` | Kubernetes manifests | Defines namespace labels, ownership, RBAC, and resource guardrails. |
 | Local registry integration | k3d registry and image workflows | `platform-engineering` | k3d + Docker/ECR workflows | Supports fast local image import and AWS-like ECR pull flows. |
+| Argo CD | `gitops` | `platform-engineering` | Helm | Provides the local GitOps controller for application and platform sync workflows. |
 
-Do not install broader platform components such as GitOps controllers, observability stacks, secret managers, or service mesh until the minimum set is stable.
+Do not install broader platform components such as full observability stacks, external secret managers, or service mesh until the minimum set and GitOps bootstrap are stable.
 
 ## Operation
 
@@ -33,6 +34,14 @@ Recover the Helm-managed platform components:
 
 ```bash
 make platform-components-recover
+```
+
+Argo CD is installed and recovered through dedicated GitOps targets:
+
+```bash
+make argocd-install
+make argocd-verify
+make argocd-recover
 ```
 
 ## Proof Tests
@@ -210,6 +219,54 @@ Notes:
 
 - The local install forces Kyverno webhook failure policy to `Ignore` while policies are being introduced in audit mode.
 - If Kyverno is unhealthy, stabilize it before relying on `policy-smoke-apply`.
+
+### Argo CD
+
+Argo CD owns local GitOps reconciliation workflows.
+
+Install:
+
+```bash
+make argocd-install
+```
+
+Verify:
+
+```bash
+make argocd-verify
+```
+
+Access:
+
+```bash
+make argocd-password
+make argocd-port-forward
+```
+
+Open:
+
+```text
+https://localhost:8081
+```
+
+Remove:
+
+```bash
+make argocd-remove
+```
+
+Recovery:
+
+```bash
+make argocd-recover
+```
+
+Notes:
+
+- Argo CD runs in the managed `gitops` namespace.
+- The local runbook is `gitops/local-argocd-bootstrap.md`.
+- Port `8081` is used for UI/API port-forwarding because `8080` is reserved
+  for local Traefik ingress.
 
 ### Namespace Standards
 
